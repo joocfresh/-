@@ -1,0 +1,33 @@
+name: Add issue to project
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add issue to project
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            const issueId = context.payload.issue.node_id;
+
+            const projectId = "PVT_kwHOAO_BB84A85jh"; // 아래에서 찾는 법 설명
+            const query = `
+              mutation {
+                addProjectV2ItemById(input: {
+                  projectId: "${projectId}",
+                  contentId: "${issueId}"
+                }) {
+                  item {
+                    id
+                  }
+                }
+              }
+            `;
+
+            const result = await github.graphql(query);
+            console.log(result);
